@@ -1,0 +1,10 @@
+body {
+  background-color: #f0f8ff;
+  font-family: Arial, sans-serif;
+}
+
+div {
+  padding: 10px;
+  border: 1px solid #333;
+  margin: 5px;
+}

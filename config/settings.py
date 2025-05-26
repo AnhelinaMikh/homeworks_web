@@ -1,3 +1,4 @@
+import os  #  add import to lection 20? for templates
 """
 Django settings for config project.
 
@@ -9,8 +10,8 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-{% load static %}
-import os  #  add import to lection 20? for templates
+
+
 
 from pathlib import Path
 
@@ -125,9 +126,12 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] #add lesson 20
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] #add lesson 20
+
+# STATIC_ROOT нужен для продакшена, для сбора статики командой collectstatic
