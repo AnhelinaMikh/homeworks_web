@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -32,9 +33,9 @@ def index(request):
         'my_set': my_set,
         'my_tuple': my_tuple,
         'my_class': my_class,
-        'display_num': True #or write False
+        'display_num': True,
+        'now': datetime.now()
     })
-
 # 1st version
 
 # def first(request):

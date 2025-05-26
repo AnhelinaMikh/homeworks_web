@@ -1,8 +1,9 @@
-{% extends 'base.html' %} {% block content %} {% include 'add.html' %}
-<div style="padding: 20px; background-color: fuchsia">
-  Extended template index!
-</div>
-<a href="{% url 'first' %}">To the first page</a>
+{% extends 'base.html' %} {% block content %}
+<div>{{ now| date:"SHORT_DATE_FORMAT" }}</div>
+<div>{{ now|date:"D d M Y" }} {{ value|time:"H:i" }}</div>
+<div>{{ not_exist|default:"nothing" }}</div>
+<div>{{ my_str | capfirst }}</div>
+<div>{{ my_list | join:"**" }}</div>
 {% endblock %}
 
 <!-- #1st variant web -->
@@ -118,5 +119,3 @@
 Кликни на неё — она должна вести на http://127.0.0.1:8000/first/
 
 Там должна открыться страница с текстом "Это страница First" -->
-
-<!-- 7 Extends и block at the beginning -->
