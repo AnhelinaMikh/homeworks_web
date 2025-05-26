@@ -1,3 +1,10 @@
+{% extends 'base.html' %} {% block content %} {% include 'add.html' %}
+<div style="padding: 20px; background-color: fuchsia">
+  Extended template index!
+</div>
+<a href="{% url 'first' %}">To the first page</a>
+{% endblock %}
+
 <!-- #1st variant web -->
 
 <!-- <!DOCTYPE html>
@@ -90,7 +97,7 @@
 
 <!-- 6 -->
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -101,7 +108,7 @@
       <a href="{% url 'first' %}">Another page</a>
     </div>
   </body>
-</html>
+</html> -->
 
 <!-- Запусти сервер и проверь
 Открой в браузере главную страницу: http://127.0.0.1:8000/
@@ -111,3 +118,5 @@
 Кликни на неё — она должна вести на http://127.0.0.1:8000/first/
 
 Там должна открыться страница с текстом "Это страница First" -->
+
+<!-- 7 Extends и block at the beginning -->

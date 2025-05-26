@@ -35,5 +35,10 @@ def index(request):
         'display_num': True #or write False
     })
 
+# 1st version
+
+# def first(request):
+#     return HttpResponse("Это страница First")
+
 def first(request):
-    return HttpResponse("Это страница First")
+    return render(request, 'first.html')
