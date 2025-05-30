@@ -1,6 +1,33 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from datetime import datetime, time
+from .forms import MyForm
+from django.shortcuts import redirect
+from .forms import AuthorForm
+
+
+def create_author(request):
+    if request.method == 'POST':
+        form = AuthorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('success-page')  # замените на вашу страницу
+    else:
+        form = AuthorForm()
+    return render(request, 'author_form.html', {'form': form})
+
+# to lesson 23
+def form_view(request):
+    # name = request.GET.get("my_name")
+    # return render(request, "form.html", {"name": name}) 
+    if request.method == 'POST':
+        form = MyForm(request.POST)
+        if form.is_valid():
+            return render(request, 'form_was_valid.html')
+    else:
+        form = MyForm()
+
+    return render(request, 'form.html', {'form': form})
 
 class MyClass:
     string = ''
