@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Editing an article{% endblock %}
+{% block content %}
+<h1>Edit an article</h1>
+<form method="post">
+    {% csrf_token %}
+    <!-- form for edition -->
+    <button type="submit">Save</button>
+</form>
+{% endblock %}

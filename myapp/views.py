@@ -7,7 +7,6 @@ from .forms import AuthorForm
 from django.views import View
 from django.http import Http404
 
-import datetime
 
 def create_author(request):
     if request.method == 'POST':
@@ -64,53 +63,53 @@ def first(request):
     return render(request, 'first.html')
 
 def my_feed(request):
-    return HttpResponse("Страница с лентой пользователя по его подпискам")
+    return HttpResponse("Page with a user's feed of their subscriptions")
 
 def article_detail(request, article_id):
-    return HttpResponse(f"Статья с ID {article_id}")
+    return HttpResponse(f"Article with ID {article_id}")
 
 def article_comment(request, article_id):
-    return HttpResponse(f"Добавление комментария к статье с ID {article_id}")
+    return HttpResponse(f"Adding a comment to an article with ID {article_id}")
 
 def article_update(request, article_id):
-    return HttpResponse(f"Редактирование статьи с ID {article_id}")
+    return HttpResponse(f"Editing an article with an ID {article_id}")
 
 def article_delete(request, article_id):
-    return HttpResponse(f"Удаление статьи с ID {article_id}")
+    return HttpResponse(f"Deleting an article with ID{article_id}")
 
 def create_article(request):
-    return HttpResponse("Создание новой статьи")
+    return HttpResponse("Creating a new article")
 
 def topic_list(request):
-    return HttpResponse("Список всех тем")
+    return HttpResponse("List of all topics")
 
 def topic_articles(request, topic_id):
-    return HttpResponse(f"Статьи по теме ID {topic_id}")
+    return HttpResponse(f"Articles on the topic ID {topic_id}")
 
 def topic_subscribe(request, topic_id):
-    return HttpResponse(f"Подписка на тему ID {topic_id}")
+    return HttpResponse(f"Topic Subscription ID {topic_id}")
 
 def topic_unsubscribe(request, topic_id):
-    return HttpResponse(f"Отписка от темы ID {topic_id}")
+    return HttpResponse(f"Unsubscribe from the topic ID {topic_id}")
 
 def profile_view(request):
-    return HttpResponse("Профиль пользователя и подписки")
+    return HttpResponse("User profile and subscriptions")
 
 def register_view(request):
-    return HttpResponse("Регистрация нового пользователя")
+    return HttpResponse("New User Registration")
 
 def login_view(request):
-    return HttpResponse("Вход пользователя")
+    return HttpResponse("User Login")
 
 def logout_view(request):
-    return HttpResponse("Выход пользователя")
+    return HttpResponse("User Logout")
 
 def set_password(request):
-    return HttpResponse("Смена пароля")
+    return HttpResponse("Change password")
 
 def articles_by_date(request, year, month):
     try:
         datetime.datetime(year, month, 1)
     except ValueError:
-        raise Http404("Неправильная дата")
+        raise Http404("Incorrect date")
     return HttpResponse(f"Статьи за {month:02}/{year}")
