@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 class Profile(models.Model):  
     name = models.CharField(max_length=100)
     avatar = models.ImageField(upload_to='avatars/')
+    topics = models.ManyToManyField('Topic', blank=True)
 
     def __str__(self):
         return self.name
@@ -23,6 +24,13 @@ GENRE_CHOICES = (
     (5, _("Other"))
 )
 
+class Topic(models.Model):
+    name = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    users = models.ManyToManyField(User, related_name="subscribed_topics", blank=True)
+
+    def __str__(self):
+        return self.name
 
 class Article(models.Model):
     name = models.CharField(max_length=100)  # или title
@@ -35,7 +43,10 @@ class Article(models.Model):
     def __str__(self):
         return self.name
 
+    topics = models.ManyToManyField(Topic, blank=True)
 
+    def __str__(self):
+        return self.name
 
 class Comment(models.Model):
     text = models.CharField(max_length=1000)
