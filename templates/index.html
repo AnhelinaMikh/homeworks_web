@@ -1,7 +1,23 @@
 {% extends 'base.html' %}
-{% block title %}All articles{% endblock %}
+
 {% block content %}
-<h1>Welcome!</h1>
-<h2>All articles</h2>
-<p>Here will be a list of all articles</p>
+  <h1>All Articles</h1>
+  <ul>
+    {% for article in articles %}
+      <li>
+        <a href="{% url 'article-detail' article.id %}"><strong>{{ article.name }}</strong></a><br>
+        {{ article.text|slice:":50" }}...<br>
+        Темы:
+        {% for topic in article.topics.all %}
+          <a href="{% url 'topic-articles' topic.id %}">{{ topic.name }}</a>{% if not forloop.last %}, {% endif %}
+        {% empty %}
+          no items
+        {% endfor %}
+      </li>
+      <hr>
+    {% empty %}
+      <li>No articles</li>
+    {% endfor %}
+  </ul>
 {% endblock %}
+

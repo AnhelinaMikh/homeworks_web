@@ -1,6 +1,26 @@
 {% extends 'base.html' %}
-{% block title %}My feed{% endblock %}
+
 {% block content %}
-<h1>My feed</h1>
-<p>Here are articles on topics you are subscribed to.</p>
+  <h1>My feed</h1>
+
+  <p>Subscribe to topics: {{ topics|join:", " }}</p>
+
+  {% if articles %}
+    <ul>
+      {% for article in articles %}
+        <li>
+          <a href="{% url 'article-detail' article.id %}">{{ article.name|truncatechars:50 }}</a>
+          <br>
+          <small>Topics: 
+            {% for topic in article.topics.all %}
+              <a href="{% url 'topic-articles' topic.id %}">{{ topic.name }}</a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </small>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>There are no articles on these topics yet.</p>
+    <a href="{% url 'topic-list' %}">Select interesting topics</a>
+  {% endif %}
 {% endblock %}
