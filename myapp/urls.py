@@ -6,7 +6,7 @@ from .views import (
     register_view, login_view, logout_view, set_password, articles_by_date
 )
 
-
+from . import views
 
 
 

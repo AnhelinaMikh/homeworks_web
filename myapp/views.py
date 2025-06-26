@@ -6,6 +6,9 @@ from django.shortcuts import redirect
 from .forms import AuthorForm
 from django.views import View
 from django.http import Http404
+from .models import Article
+
+from .models import Article
 
 
 def create_author(request):
