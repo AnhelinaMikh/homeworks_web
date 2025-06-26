@@ -1,0 +1,48 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Form_Html</title>
+  </head>
+  <body>
+    <h1>HTML_form (GET)</h1>
+
+    <form method="get" action="{% url 'form-view' %}">
+      <label
+        >Input your name:
+        <input type="text" name="my_name" />
+      </label>
+      <button type="submit">Send</button>
+    </form>
+
+    {% if name %}
+    <p>Hello, {{ name }}!</p>
+    {% endif %}
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Форма</title>
+  </head>
+  <body>
+    <h1>Form_with Django Form</h1>
+    <!-- <form method="post" action="{% url 'form-view' %}">
+      {% csrf_token %} {{ form.as_p }}
+      <button type="submit">Send</button>
+    </form> -->
+
+    <form method="post" action="{% url 'form-view' %}">
+      {% csrf_token %} {% for field in form %}
+      <div>
+        {{ field.label_tag }} {{ field }} {% if field.errors %}
+        <div style="color: red">{{ field.errors }}</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+      <button type="submit">Send form</button>
+    </form>
+  </body>
+</html>
