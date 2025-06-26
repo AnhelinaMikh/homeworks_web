@@ -1,5 +1,5 @@
-<!-- templates/article_list.html -->
-<h1>Все статьи</h1>
+
+<h1>All articles</h1>
 <ul>
   {% for article in articles %}
     <li>
@@ -7,14 +7,14 @@
         {{ article.name }} — {{ article.text|truncatechars:50 }}
       </a>
       <br>
-      <strong>Темы:</strong>
+      <strong>Topics:</strong>
       {% for topic in article.topics.all %}
         <a href="{% url 'topic-articles' topic.id %}">{{ topic.name }}</a>{% if not forloop.last %}, {% endif %}
       {% empty %}
-        Нет тем
+      No topics
       {% endfor %}
     </li>
   {% empty %}
-    <li>Нет статей</li>
+    <li>No articles</li>
   {% endfor %}
 </ul>

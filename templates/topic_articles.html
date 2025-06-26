@@ -2,7 +2,21 @@
 
 {% block content %}
   <h1>Related articles: {{ topic.name }}</h1>
-  
+
+  {% if user.is_authenticated %}
+    {% if user in topic.subscribers.all %}
+      <form action="{% url 'topic-unsubscribe' topic.id %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">Unsubscribe</button>
+      </form>
+    {% else %}
+      <form action="{% url 'topic-subscribe' topic.id %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">Subscribe</button>
+      </form>
+    {% endif %}
+  {% endif %}
+
   {% if articles %}
     <ul>
       {% for article in articles %}

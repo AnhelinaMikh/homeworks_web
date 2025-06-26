@@ -53,11 +53,12 @@ class Comment(models.Model):
     text = models.CharField(max_length=1000)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     comment = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.text} by {self.user.username}"
+        return f"{self.text} by {self.author.username}"
+
 
 
 

@@ -1,38 +1,73 @@
-from django.http import HttpResponse
-from django.shortcuts import render
-from datetime import datetime, time
-from .forms import MyForm
-from django.shortcuts import redirect
-from .forms import AuthorForm
+from datetime import datetime
+from django.contrib import messages
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse, Http404
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.http import Http404
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic.edit import FormMixin
+
+from .forms import MyForm, AuthorForm, RegisterForm, CommentForm, ArticleForm
 from .models import Article, Topic, Comment
-from django.db.models import Q
 
 
-def article_list(request):
-    articles = Article.objects.all().order_by('-created_at')  
-    context = {
-        'articles': articles,
-    }
-    return render(request, 'article_list.html', context)
-
-def create_author(request):
+# --- Auth views ---
+def register_view(request):
     if request.method == 'POST':
-        form = AuthorForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('success-page')  
+            messages.success(request, 'Registration successful!')
+            return redirect('login')
     else:
-        form = AuthorForm()
-    return render(request, 'author_form.html', {'form': form})
+        form = RegisterForm()
+    return render(request, 'registration/register.html', {'form': form})
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            login(request, form.get_user())
+            return redirect('index')
+        messages.error(request, 'Invalid credentials')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'registration/login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('index')
+
+def set_password(request):
+    return HttpResponse("Change password (to be implemented)")
 
 
+# --- Main page ---
+class IndexView(ListView):
+    model = Article
+    template_name = 'index.html'
+    context_object_name = 'articles'
+    ordering = ['-created_at']
 
+
+def about(request):
+    return HttpResponse("About page")
+
+def contacts(request):
+    return HttpResponse("Contacts page")
+
+def first(request):
+    return render(request, 'first.html')
+
+
+# --- Form example ---
 class FormView(View):
     def get(self, request):
-        form = MyForm()
-        return render(request, 'form.html', {'form': form})
+        return render(request, 'form.html', {'form': MyForm()})
 
     def post(self, request):
         form = MyForm(request.POST)
@@ -41,117 +76,116 @@ class FormView(View):
         return render(request, 'form.html', {'form': form})
 
 
-
-class MyClass:
-    string = ''
-
-    def __init__(self, s):
-        self.string = s
-
-def home(request):
-    return HttpResponse("Это главная страница")
-
-def about(request):
-    return HttpResponse("Это страница 'О нас'")
-
-def contacts(request):
-    return HttpResponse("Это страница с контактами")
-
-def index(request):
-    articles = Article.objects.order_by('-created_at')
-    return render(request, 'index.html', {'articles': articles})
+# --- Author creation ---
+def create_author(request):
+    if request.method == 'POST':
+        form = AuthorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('index')
+    else:
+        form = AuthorForm()
+    return render(request, 'author_form.html', {'form': form})
 
 
-def first(request):
-    return render(request, 'first.html')
-
-
+# --- My Feed ---
+@login_required
 def my_feed(request):
-   
-    interesting_topics = ['Sport', 'Film']
-    
-    articles = Article.objects.filter(
-        topics__name__in=interesting_topics
-    ).distinct().order_by('-created_at')
+    topics = request.user.subscribed_topics.all()
+    articles = Article.objects.filter(topics__in=topics).distinct().order_by('-created_at')
+    return render(request, 'my_feed.html', {'articles': articles, 'topics': topics})
 
-    return render(request, 'my_feed.html', {'articles': articles, 'topics': interesting_topics})
 
-def article_detail(request, article_id):
-    try:
-        article = Article.objects.get(pk=article_id)
-    except Article.DoesNotExist:
-        raise Http404("Article not found")
+# --- Articles ---
+class ArticleDetailView(FormMixin, DetailView):
+    model = Article
+    template_name = 'article_detail.html'
+    context_object_name = 'article'
+    form_class = CommentForm
 
-    comments = Comment.objects.filter(article=article)
+    def get_success_url(self):
+        return reverse('article-detail', kwargs={'pk': self.object.pk})
 
-    return render(request, 'article_detail.html', {
-        'article': article,
-        'comments': comments
-    })
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = self.object.comment_set.all()
+        context['form'] = self.get_form()
+        return context
 
-def article_comment(request, article_id):
-    return HttpResponse(f"Adding a comment to an article with ID {article_id}")
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.article = self.object
+            comment.author = request.user
+            comment.save()
+            return redirect(self.get_success_url())
+        return self.form_invalid(form)
 
-def article_update(request, article_id):
-    return HttpResponse(f"Editing an article with an ID {article_id}")
 
-def article_delete(request, article_id):
-    return HttpResponse(f"Deleting an article with ID{article_id}")
+class ArticleCreateView(LoginRequiredMixin, CreateView):
+    model = Article
+    form_class = ArticleForm
+    template_name = 'article_form.html'
+    success_url = reverse_lazy('index')
 
-def create_article(request):
-    return HttpResponse("Creating a new article")
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+
+class ArticleUpdateView(LoginRequiredMixin, UpdateView):
+    model = Article
+    form_class = ArticleForm
+    template_name = 'article_form.html'
+    success_url = reverse_lazy('index')
+
+
+class ArticleDeleteView(LoginRequiredMixin, DeleteView):
+    model = Article
+    template_name = 'article_confirm_delete.html'
+    success_url = reverse_lazy('index')
+
+
+# --- Topics ---
+class TopicDetailView(DetailView):
+    model = Topic
+    template_name = 'topic_articles.html'
+    context_object_name = 'topic'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['articles'] = self.object.article_set.order_by('-created_at')
+        return context
+
 
 def topic_list(request):
-    topics = Topic.objects.all()
-    return render(request, 'topic_list.html', {'topics': topics})
+    return render(request, 'topic_list.html', {'topics': Topic.objects.all()})
 
-def topic_articles(request, topic_id):
-    try:
-        topic = Topic.objects.get(pk=topic_id)
-    except Topic.DoesNotExist:
-        raise Http404("Topic not found")
-
-    articles = topic.article_set.order_by('-created_at')
-    return render(request, 'topic_articles.html', {
-        'topic': topic,
-        'articles': articles
-    })
-
-
+@login_required
 def topic_subscribe(request, topic_id):
-    return HttpResponse(f"Topic Subscription ID {topic_id}")
+    topic = get_object_or_404(Topic, pk=topic_id)
+    topic.subscribers.add(request.user)
+    return redirect(request.META.get('HTTP_REFERER', '/'))
 
+@login_required
 def topic_unsubscribe(request, topic_id):
-    return HttpResponse(f"Unsubscribe from the topic ID {topic_id}")
+    topic = get_object_or_404(Topic, pk=topic_id)
+    topic.subscribers.remove(request.user)
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
 
 def profile_view(request):
-    return HttpResponse("User profile and subscriptions")
+    return HttpResponse("User profile (to be implemented)")
 
-def register_view(request):
-    return HttpResponse("New User Registration")
-
-def login_view(request):
-    return HttpResponse("User Login")
-
-def logout_view(request):
-    return HttpResponse("User Logout")
-
-def set_password(request):
-    return HttpResponse("Change password")
 
 def articles_by_date(request, year, month):
     try:
-        date = datetime(year, month, 1)
+        datetime(year, month, 1)
     except ValueError:
-        raise Http404("Incorrect date")
-
-    articles = Article.objects.filter(
-        created_at__year=year,
-        created_at__month=month
-    ).order_by('-created_at')
-
-    return render(request, 'articles_by_date.html', {
-        'articles': articles,
-        'year': year,
-        'month': month
-    })
+        raise Http404("Invalid date")
+    articles = Article.objects.filter(created_at__year=year, created_at__month=month).order_by('-created_at')
+    return render(request, 'articles_by_date.html', {'articles': articles, 'year': year, 'month': month})
