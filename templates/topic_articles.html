@@ -1,5 +1,19 @@
 {% extends 'base.html' %}
-{% block title %}Related articles{% endblock %}
+
 {% block content %}
-<h1>Related articles</h1>
+  <h1>Related articles: {{ topic.name }}</h1>
+  
+  {% if articles %}
+    <ul>
+      {% for article in articles %}
+        <li>
+          <a href="{% url 'article-detail' article.id %}">{{ article.name|truncatechars:50 }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>There are no articles on this topic</p>
+  {% endif %}
+
+  <a href="{% url 'topic-list' %}">Return to the list of topics</a>
 {% endblock %}

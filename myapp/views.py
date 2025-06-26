@@ -6,10 +6,16 @@ from django.shortcuts import redirect
 from .forms import AuthorForm
 from django.views import View
 from django.http import Http404
-from .models import Article
+from .models import Article, Topic, Comment
+from django.db.models import Q
 
-from .models import Article
 
+def article_list(request):
+    articles = Article.objects.all().order_by('-created_at')  
+    context = {
+        'articles': articles,
+    }
+    return render(request, 'article_list.html', context)
 
 def create_author(request):
     if request.method == 'POST':
@@ -52,24 +58,36 @@ def contacts(request):
     return HttpResponse("Это страница с контактами")
 
 def index(request):
-    context = {
-        "now": datetime.now(),
-        "value": time(14, 30),
-        "not_exist": None,
-        "my_str": "hello world",
-        "my_list": ["one", "two", "three"],
-    }
-    return render(request, 'index.html', context)
+    articles = Article.objects.order_by('-created_at')
+    return render(request, 'index.html', {'articles': articles})
 
 
 def first(request):
     return render(request, 'first.html')
 
+
 def my_feed(request):
-    return HttpResponse("Page with a user's feed of their subscriptions")
+   
+    interesting_topics = ['Sport', 'Film']
+    
+    articles = Article.objects.filter(
+        topics__name__in=interesting_topics
+    ).distinct().order_by('-created_at')
+
+    return render(request, 'my_feed.html', {'articles': articles, 'topics': interesting_topics})
 
 def article_detail(request, article_id):
-    return HttpResponse(f"Article with ID {article_id}")
+    try:
+        article = Article.objects.get(pk=article_id)
+    except Article.DoesNotExist:
+        raise Http404("Article not found")
+
+    comments = Comment.objects.filter(article=article)
+
+    return render(request, 'article_detail.html', {
+        'article': article,
+        'comments': comments
+    })
 
 def article_comment(request, article_id):
     return HttpResponse(f"Adding a comment to an article with ID {article_id}")
@@ -84,10 +102,21 @@ def create_article(request):
     return HttpResponse("Creating a new article")
 
 def topic_list(request):
-    return HttpResponse("List of all topics")
+    topics = Topic.objects.all()
+    return render(request, 'topic_list.html', {'topics': topics})
 
 def topic_articles(request, topic_id):
-    return HttpResponse(f"Articles on the topic ID {topic_id}")
+    try:
+        topic = Topic.objects.get(pk=topic_id)
+    except Topic.DoesNotExist:
+        raise Http404("Topic not found")
+
+    articles = topic.article_set.order_by('-created_at')
+    return render(request, 'topic_articles.html', {
+        'topic': topic,
+        'articles': articles
+    })
+
 
 def topic_subscribe(request, topic_id):
     return HttpResponse(f"Topic Subscription ID {topic_id}")
@@ -112,7 +141,17 @@ def set_password(request):
 
 def articles_by_date(request, year, month):
     try:
-        datetime.datetime(year, month, 1)
+        date = datetime(year, month, 1)
     except ValueError:
         raise Http404("Incorrect date")
-    return HttpResponse(f"Статьи за {month:02}/{year}")
+
+    articles = Article.objects.filter(
+        created_at__year=year,
+        created_at__month=month
+    ).order_by('-created_at')
+
+    return render(request, 'articles_by_date.html', {
+        'articles': articles,
+        'year': year,
+        'month': month
+    })

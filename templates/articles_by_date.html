@@ -1,5 +1,24 @@
 {% extends 'base.html' %}
-{% block title %}Articles by date{% endblock %}
+
 {% block content %}
-<h1>Articles by {{ month }}/{{ year }}</h1>
+  <h1>Articles for {{ month }}/{{ year }}</h1>
+
+  {% if articles %}
+    <ul>
+      {% for article in articles %}
+        <li>
+          <a href="{% url 'article-detail' article.id %}">{{ article.name|truncatechars:50 }}</a>
+          <br>
+          <small>Topics: 
+            {% for topic in article.topics.all %}
+              <a href="{% url 'topic-articles' topic.id %}">{{ topic.name }}</a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </small>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>There are no articles for this period</p>
+    <a href="{% url 'index' %}">To the main page</a>
+  {% endif %}
 {% endblock %}

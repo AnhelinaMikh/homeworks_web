@@ -1,7 +1,7 @@
-# models.py
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.utils import timezone
+from django.utils.translation import gettext as _
 
 
 class Profile(models.Model):  
@@ -12,9 +12,6 @@ class Profile(models.Model):
     def __str__(self):
         return self.name
 
-# lection 22
-from django.utils import timezone
-from django.utils.translation import gettext as _
 
 GENRE_CHOICES = (
     (1, _("Not selected")),
@@ -27,7 +24,11 @@ GENRE_CHOICES = (
 class Topic(models.Model):
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
-    users = models.ManyToManyField(User, related_name="subscribed_topics", blank=True)
+    subscribers = models.ManyToManyField(User, related_name='subscribed_topics', blank=True)
+
+    def __str__(self):
+        return self.name
+
 
     def __str__(self):
         return self.name
