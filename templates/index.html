@@ -1,18 +1,26 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>All Articles</h1>
+  <h1>All articles</h1>
+
+  {% if user.is_authenticated %}
+    <p><a href="{% url 'create-article' %}">Create an article</a></p>
+  {% else %}
+    <p><a href="{% url 'login' %}">Login</a>, to create an article</p>
+  {% endif %}
+
   <ul>
     {% for article in articles %}
       <li>
         <a href="{% url 'article-detail' article.id %}"><strong>{{ article.name }}</strong></a><br>
-        {{ article.text|slice:":50" }}...<br>
-        Темы:
-        {% for topic in article.topics.all %}
-          <a href="{% url 'topic-articles' topic.id %}">{{ topic.name }}</a>{% if not forloop.last %}, {% endif %}
-        {% empty %}
-          no items
-        {% endfor %}
+        {{ article.text|truncatewords:30 }}<br>
+        <small>Topics:
+          {% for topic in article.topics.all %}
+            <a href="{% url 'topic-articles' topic.id %}">{{ topic.name }}</a>{% if not forloop.last %}, {% endif %}
+          {% empty %}
+            no items
+          {% endfor %}
+        </small>
       </li>
       <hr>
     {% empty %}
@@ -20,4 +28,3 @@
     {% endfor %}
   </ul>
 {% endblock %}
-
