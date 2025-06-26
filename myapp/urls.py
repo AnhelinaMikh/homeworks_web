@@ -6,12 +6,12 @@ from .views import (
     register_view, login_view, logout_view, set_password, articles_by_date
 )
 
-from .views import FormView
+
 
 
 
 urlpatterns = [
-    path('', index, name='index'),
+    
     path('about/', about, name='about'),
     path('contacts/', contacts, name='contacts'),
     path('first/', first, name='first'),
@@ -19,33 +19,30 @@ urlpatterns = [
     path('form-url/', FormView.as_view(), name='form-view'),
 
     # ДОБАВЛЕННЫЕ ДЛЯ ДЗ:
-    path('my-feed/', my_feed, name='my-feed'),
-    path('create/', create_article, name='create-article'),
-    path('<int:article_id>/', article_detail, name='article-detail'),
-    path('<int:article_id>/comment/', article_comment, name='article-comment'),
-    path('<int:article_id>/update/', article_update, name='article-update'),
-    path('<int:article_id>/delete/', article_delete, name='article-delete'),
+    path('', index, name='index'), #
+    path('my-feed/', my_feed, name='my-feed'), #
+    path('create/', create_article, name='create-article'), #
+    path('<int:year>/<int:month>/', articles_by_date, name='articles-by-date'), #
+    path('<int:article_id>/', article_detail, name='article-detail'), #
+    path('<int:article_id>/comment/', article_comment, name='article-comment'), #
+    path('<int:article_id>/update/', article_update, name='article-update'), #
+    path('<int:article_id>/delete/', article_delete, name='article-delete'), #
 
     path('topics/', topic_list, name='topic-list'),
-    path('topics/<int:topic_id>/', topic_articles, name='topic-articles'),
+    path('topics/<int:topic_id>/', topic_articles, name='topic-articles'), #
     path('topics/<int:topic_id>/subscribe/', topic_subscribe, name='topic-subscribe'),
     path('topics/<int:topic_id>/unsubscribe/', topic_unsubscribe, name='topic-unsubscribe'),
 
-    path('profile/', profile_view, name='profile'),
-    path('register/', register_view, name='register'),
-    path('set-password/', set_password, name='set-password'),
-    path('login/', login_view, name='login'),
-    path('logout/', logout_view, name='logout'),
+    path('profile/', profile_view, name='profile'), #
+    path('register/', register_view, name='register'), #
+    path('set-password/', set_password, name='set-password'), #
+    path('login/', login_view, name='login'), #
+    path('logout/', logout_view, name='logout'), #
 
-    path('<int:year>/<int:month>/', articles_by_date, name='articles-by-date'),
+    
 ]
 
 
-#http://127.0.0.1:8000/
-
-#http://127.0.0.1:8000/about/
-
-#http://127.0.0.1:8000/contacts/
 
 
 

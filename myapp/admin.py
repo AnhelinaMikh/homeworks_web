@@ -1,8 +1,10 @@
 from django.contrib import admin
-from .models import Article, Profile, Author, Comment, Like
+from .models import Article, Comment, Like, Author, Book, Profile
 
 admin.site.register(Article)
-admin.site.register(Profile)
-admin.site.register(Author)
 admin.site.register(Comment)
 admin.site.register(Like)
+admin.site.register(Author)
+admin.site.register(Book)
+admin.site.register(Profile)
+
